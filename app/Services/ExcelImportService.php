@@ -46,9 +46,9 @@ class ExcelImportService
             }
             $spreadsheet = IOFactory::load($filePath);
             $worksheet = $spreadsheet->getActiveSheet();
-            // getHighestDataRow() menghitung baris yang benar-benar berisi data,
-            // bukan baris kosong yang sekadar punya format (yang membuat getHighestRow membengkak).
-            $totalRows += max(0, $worksheet->getHighestDataRow() - 1); // exclude header
+            // Hitung hanya baris yang benar-benar berisi data. Baris kosong yang sekadar
+            // punya sisa format membuat getHighestRow() membengkak sampai ratusan/ribuan.
+            $totalRows += $this->countDataRows($worksheet); // exclude header
             $spreadsheet->disconnectWorksheets();
             unset($spreadsheet);
         }
@@ -132,7 +132,7 @@ class ExcelImportService
             return $result;
         }
 
-        $dataRowCount = $worksheet->getHighestRow() - 1;
+        $dataRowCount = $this->countDataRows($worksheet);
         $this->logEntry($upload, $fileType, null, 'info',
             "Memulai proses file {$this->fileTypeMap[$fileType]} ({$dataRowCount} baris)");
 
@@ -151,6 +151,12 @@ class ExcelImportService
             for ($col = 1; $col <= $highestColumnIndex; $col++) {
                 if (!isset($headerRow[$col])) continue;
                 $cellValue = $worksheet->getCellByColumnAndRow($col, $row)->getValue();
+
+                // Sel teks bisa dikembalikan sebagai objek RichText. Ubah ke string biasa
+                // agar pembersihan data (trim, '-'/'' -> null) & validasi empty() bekerja.
+                if ($cellValue instanceof \PhpOffice\PhpSpreadsheet\RichText\RichText) {
+                    $cellValue = $cellValue->getPlainText();
+                }
 
                 // Handle Excel date serial numbers
                 if ($headerRow[$col] === 'Date' && is_numeric($cellValue)) {
@@ -226,6 +232,35 @@ class ExcelImportService
         unset($spreadsheet);
 
         return $result;
+    }
+
+    /**
+     * Hitung jumlah baris data yang benar-benar terisi (di luar header).
+     * getHighestRow() bisa membengkak karena baris kosong yang punya sisa format,
+     * jadi kita batasi ke area data dan lewati baris yang seluruh selnya kosong.
+     */
+    private function countDataRows($worksheet): int
+    {
+        $highestRow = $worksheet->getHighestDataRow();
+        $highestCol = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString(
+            $worksheet->getHighestDataColumn()
+        );
+
+        $count = 0;
+        for ($row = 2; $row <= $highestRow; $row++) {
+            for ($col = 1; $col <= $highestCol; $col++) {
+                $value = $worksheet->getCellByColumnAndRow($col, $row)->getValue();
+                if ($value instanceof \PhpOffice\PhpSpreadsheet\RichText\RichText) {
+                    $value = $value->getPlainText();
+                }
+                if ($value !== null && trim((string) $value) !== '') {
+                    $count++;
+                    break; // baris ini ada isinya, lanjut ke baris berikutnya
+                }
+            }
+        }
+
+        return $count;
     }
 
     /**

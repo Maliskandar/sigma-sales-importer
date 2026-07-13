@@ -98,6 +98,26 @@ $dataRowCount = $worksheet->getHighestRow() - 1;
 
 ---
 
+## 6B. [BUG DITEMUKAN & DIPERBAIKI] Sel teks terbaca sebagai objek RichText
+
+**Masalah.** PhpSpreadsheet mengembalikan sebagian sel teks sebagai objek
+`RichText`, bukan `string`. Akibatnya:
+- Pembersihan data di importer (`is_string()` → `trim`, ubah `''`/`'-'` menjadi `null`)
+  dilewati karena nilainya objek, bukan string.
+- Validasi kolom wajib memakai `empty()` — dan `empty($object)` **selalu `false`** —
+  sehingga baris dengan **OrderNumber kosong pun lolos** dan tersimpan dengan nilai `''`.
+
+**Solusi.** Saat membaca tiap sel, objek RichText dikonversi lebih dulu ke teks biasa:
+```php
+if ($cellValue instanceof \PhpOffice\PhpSpreadsheet\RichText\RichText) {
+    $cellValue = $cellValue->getPlainText();
+}
+```
+Setelah perbaikan, pembersihan data & validasi berjalan benar (OrderNumber kosong,
+Date kosong, kode produk tak terdaftar, Quantity 0 — semuanya tertangkap).
+
+---
+
 ## 7. Duplikasi data saat re-import
 
 **Masalah.** Meng-upload file yang sama dua kali berpotensi menggandakan baris.
@@ -115,6 +135,19 @@ memperbarui, bukan menduplikasi. Seluruh batch dibungkus `DB::transaction`.
 **Solusi.** Baris diproses **per-chunk (100 baris)** dan disimpan bertahap. Proses
 dijalankan **asynchronous via Queue** (`ImportExcelJob`), sehingga request HTTP tidak
 menunggu dan tidak timeout.
+
+---
+
+## 9. Jumlah baris membengkak karena baris kosong berformat
+
+**Masalah.** File Excel dari sumber sering menyisakan **baris kosong yang masih menyimpan
+format** (border/warna) jauh di bawah data. Akibatnya `getHighestRow()` menganggap area
+terpakai sampai ratusan baris — mis. `SALES MP` terbaca **999 baris** padahal isinya 2,
+dan `SALES PRODUK` terbaca **2 baris** padahal 1 (ada 1 baris kosong ekstra).
+
+**Solusi.** Ditambahkan helper `countDataRows()` yang menghitung **hanya baris yang
+benar-benar berisi data** (mengecek tiap sel dalam area data, melewati baris kosong).
+Dipakai untuk `total_rows` maupun pesan log. Hasilnya akurat: DAILY 4, MP 2, PRODUK 1.
 
 ---
 
