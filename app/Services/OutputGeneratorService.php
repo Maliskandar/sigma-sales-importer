@@ -27,9 +27,18 @@ use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 class OutputGeneratorService
 {
     private const BULAN_ID = [
-        1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
-        5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
-        9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
+        1 => 'Januari',
+        2 => 'Februari',
+        3 => 'Maret',
+        4 => 'April',
+        5 => 'Mei',
+        6 => 'Juni',
+        7 => 'Juli',
+        8 => 'Agustus',
+        9 => 'September',
+        10 => 'Oktober',
+        11 => 'November',
+        12 => 'Desember',
     ];
 
     private string $outputDir;
@@ -154,10 +163,23 @@ class OutputGeneratorService
         $sheet->setTitle('FINANCE');
 
         $headers = [
-            'Tanggal Closing', 'Tanggal Pesanan', 'No. Invoice', 'No Resi', 'Ekspedisi',
-            'Type Transaksi', 'Advertiser', 'Platform', 'Nama Toko', 'Admin',
-            'Produk Name', 'Jumlah', 'Omzet', 'HPP Sigma', 'TaxName(%)',
-            'Total Bayar', 'Payment type',
+            'Tanggal Closing',
+            'Tanggal Pesanan',
+            'No. Invoice',
+            'No Resi',
+            'Ekspedisi',
+            'Type Transaksi',
+            'Advertiser',
+            'Platform',
+            'Nama Toko',
+            'Admin',
+            'Produk Name',
+            'Jumlah',
+            'Omzet',
+            'HPP Sigma',
+            'TaxName(%)',
+            'Total Bayar',
+            'Payment type',
         ];
         $this->writeHeaders($sheet, $headers);
 
@@ -208,10 +230,27 @@ class OutputGeneratorService
         $sheet->setTitle('MARKETING');
 
         $headers = [
-            'Tahun', 'Bulan', 'Tanggal Closing', 'Tanggal Pesanan', 'No. Invoice',
-            'No. Resi', 'Memo', 'Region', 'Ekspedisi', 'Advertiser',
-            'Platform', 'Nama Toko', 'Admin', 'Produk', 'Jumlah',
-            'Omzet', 'HPP', 'Kode Promo', 'Total Bayar', 'Metode Pembayaran', 'SKU',
+            'Tahun',
+            'Bulan',
+            'Tanggal Closing',
+            'Tanggal Pesanan',
+            'No. Invoice',
+            'No. Resi',
+            'Memo',
+            'Region',
+            'Ekspedisi',
+            'Advertiser',
+            'Platform',
+            'Nama Toko',
+            'Admin',
+            'Produk',
+            'Jumlah',
+            'Omzet',
+            'HPP',
+            'Kode Promo',
+            'Total Bayar',
+            'Metode Pembayaran',
+            'SKU',
         ];
         $this->writeHeaders($sheet, $headers);
 
