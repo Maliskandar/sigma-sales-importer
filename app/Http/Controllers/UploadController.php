@@ -150,20 +150,20 @@ class UploadController extends Controller
         $outputDir = storage_path('app/private/outputs');
         $files = [];
 
-        $summaryFile = $outputDir . "/Sales_Summary_Batch_{$upload->batch_code}.xlsx";
-        $detailFile = $outputDir . "/Sales_Detail_Produk_Batch_{$upload->batch_code}.xlsx";
+        $financeFile = $outputDir . "/FINANCE_{$upload->batch_code}.xlsx";
+        $marketingFile = $outputDir . "/MARKETING_{$upload->batch_code}.xlsx";
 
-        if (file_exists($summaryFile)) {
-            $files['summary'] = [
-                'name' => "Sales_Summary_Batch_{$upload->batch_code}.xlsx",
-                'size' => filesize($summaryFile),
+        if (file_exists($financeFile)) {
+            $files['finance'] = [
+                'name' => "FINANCE_{$upload->batch_code}.xlsx",
+                'size' => filesize($financeFile),
             ];
         }
 
-        if (file_exists($detailFile)) {
-            $files['detail'] = [
-                'name' => "Sales_Detail_Produk_Batch_{$upload->batch_code}.xlsx",
-                'size' => filesize($detailFile),
+        if (file_exists($marketingFile)) {
+            $files['marketing'] = [
+                'name' => "MARKETING_{$upload->batch_code}.xlsx",
+                'size' => filesize($marketingFile),
             ];
         }
 

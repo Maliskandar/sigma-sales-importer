@@ -8,26 +8,51 @@ use App\Models\Product;
 use App\Models\BundleItem;
 use App\Models\ProductPrice;
 use App\Models\ColumnMapping;
+use App\Models\Store;
+use App\Models\Region;
 
+/**
+ * Master data disusun berdasarkan file input & contoh output (FINANCE / MARKETING)
+ * pada Business Case. Semua aturan transformasi (mapping platform, admin toko,
+ * region, HPP per-platform, dan komponen bundle) dikendalikan lewat tabel ini,
+ * BUKAN di-hardcode di kode — sesuai poin "validasi/normalisasi via DB".
+ */
 class MasterDataSeeder extends Seeder
 {
     public function run(): void
     {
         $this->seedPlatforms();
         $this->seedProducts();
-        $this->seedBundleItems();
         $this->seedProductPrices();
+        $this->seedBundleItems();
+        $this->seedStores();
+        $this->seedRegions();
         $this->seedColumnMappings();
     }
 
     private function seedPlatforms(): void
     {
         $platforms = [
-            ['code' => 'A', 'name' => 'Direct / API', 'channel_type' => 'direct'],
-            ['code' => 'SHOPEE', 'name' => 'Shopee', 'channel_type' => 'marketplace'],
-            ['code' => 'TIKTOK', 'name' => 'TikTok Shop', 'channel_type' => 'social_commerce'],
-            ['code' => 'TOKOPEDIA', 'name' => 'Tokopedia', 'channel_type' => 'marketplace'],
-            ['code' => 'LAZADA', 'name' => 'Lazada', 'channel_type' => 'marketplace'],
+            [
+                'code' => 'A', 'name' => 'Website / Direct', 'channel_type' => 'direct',
+                'output_label' => 'WEB', 'payment_label' => null, 'aliases' => ['A', 'WEB'],
+            ],
+            [
+                'code' => 'SHOPEE', 'name' => 'Shopee', 'channel_type' => 'marketplace',
+                'output_label' => 'SHOPEE', 'payment_label' => 'Shopee', 'aliases' => ['SHOPEE'],
+            ],
+            [
+                'code' => 'TIKTOK', 'name' => 'TikTok Shop', 'channel_type' => 'social_commerce',
+                'output_label' => 'TIKTOK SHOP', 'payment_label' => 'Tiktok', 'aliases' => ['TIKTOK SHOP', 'TIKTOK'],
+            ],
+            [
+                'code' => 'TOKOPEDIA', 'name' => 'Tokopedia', 'channel_type' => 'marketplace',
+                'output_label' => 'TOKOPEDIA', 'payment_label' => 'Tokopedia', 'aliases' => ['TOKOPEDIA'],
+            ],
+            [
+                'code' => 'LAZADA', 'name' => 'Lazada', 'channel_type' => 'marketplace',
+                'output_label' => 'LAZADA', 'payment_label' => 'Lazada', 'aliases' => ['LAZADA'],
+            ],
         ];
 
         foreach ($platforms as $p) {
@@ -38,9 +63,9 @@ class MasterDataSeeder extends Seeder
     private function seedProducts(): void
     {
         $products = [
-            ['code' => 'PR01', 'name' => 'Produk Regular 01', 'is_bundle' => false, 'base_price' => 140000, 'hpp' => 80000],
-            ['code' => 'BRG01', 'name' => 'Barang 01', 'is_bundle' => false, 'base_price' => 90000, 'hpp' => 50000],
-            ['code' => 'BDL01', 'name' => 'Bundle 01 (PR01 + BRG01)', 'is_bundle' => true, 'base_price' => 280000, 'hpp' => 130000],
+            ['code' => 'PR01', 'name' => 'PRODUK SATU', 'is_bundle' => false, 'base_price' => 140000, 'hpp' => 56000],
+            ['code' => 'BRG01', 'name' => 'BARANG SATU', 'is_bundle' => false, 'base_price' => 90000, 'hpp' => 36000],
+            ['code' => 'BDL01', 'name' => 'BUNDLE BOXL (BOXL A + BOXL B)', 'is_bundle' => true, 'base_price' => 280000, 'hpp' => 49500],
         ];
 
         foreach ($products as $p) {
@@ -48,38 +73,19 @@ class MasterDataSeeder extends Seeder
         }
     }
 
-    private function seedBundleItems(): void
-    {
-        $bundle = Product::where('code', 'BDL01')->first();
-        $pr01 = Product::where('code', 'PR01')->first();
-        $brg01 = Product::where('code', 'BRG01')->first();
-
-        if ($bundle && $pr01 && $brg01) {
-            BundleItem::updateOrCreate(
-                ['bundle_product_id' => $bundle->id, 'item_product_id' => $pr01->id],
-                ['quantity' => 1]
-            );
-            BundleItem::updateOrCreate(
-                ['bundle_product_id' => $bundle->id, 'item_product_id' => $brg01->id],
-                ['quantity' => 1]
-            );
-        }
-    }
-
+    /**
+     * Harga jual & HPP per platform (Petunjuk: harga/HPP bisa berbeda tiap platform).
+     * Contoh nyata dari file output: PR01 di WEB HPP 56.000, di SHOPEE HPP 84.000.
+     */
     private function seedProductPrices(): void
     {
         $prices = [
-            // PR01 prices per platform
-            ['product_code' => 'PR01', 'platform_code' => 'A', 'selling_price' => 140000, 'hpp' => 80000],
-            ['product_code' => 'PR01', 'platform_code' => 'SHOPEE', 'selling_price' => 147000, 'hpp' => 80000],
-            ['product_code' => 'PR01', 'platform_code' => 'TIKTOK', 'selling_price' => 145000, 'hpp' => 80000],
-            // BRG01 prices per platform
-            ['product_code' => 'BRG01', 'platform_code' => 'A', 'selling_price' => 90000, 'hpp' => 50000],
-            ['product_code' => 'BRG01', 'platform_code' => 'SHOPEE', 'selling_price' => 95000, 'hpp' => 50000],
-            // BDL01 (bundle) prices per platform
-            ['product_code' => 'BDL01', 'platform_code' => 'A', 'selling_price' => 280000, 'hpp' => 130000],
-            ['product_code' => 'BDL01', 'platform_code' => 'TIKTOK', 'selling_price' => 280000, 'hpp' => 130000],
-            ['product_code' => 'BDL01', 'platform_code' => 'SHOPEE', 'selling_price' => 290000, 'hpp' => 130000],
+            ['product_code' => 'PR01', 'platform_code' => 'A', 'selling_price' => 140000, 'hpp' => 56000],
+            ['product_code' => 'PR01', 'platform_code' => 'SHOPEE', 'selling_price' => 147000, 'hpp' => 84000],
+            ['product_code' => 'PR01', 'platform_code' => 'TIKTOK', 'selling_price' => 145000, 'hpp' => 56000],
+
+            ['product_code' => 'BRG01', 'platform_code' => 'A', 'selling_price' => 90000, 'hpp' => 36000],
+            ['product_code' => 'BRG01', 'platform_code' => 'SHOPEE', 'selling_price' => 95000, 'hpp' => 36000],
         ];
 
         foreach ($prices as $p) {
@@ -91,6 +97,81 @@ class MasterDataSeeder extends Seeder
                     ['selling_price' => $p['selling_price'], 'hpp' => $p['hpp']]
                 );
             }
+        }
+    }
+
+    /**
+     * Komponen bundle. 1 baris bundle di input (mis. BDL01) dipecah menjadi
+     * beberapa baris produk di output. Omzet FINANCE & MARKETING berbeda
+     * (harga list vs harga tagihan), HPP mengikuti komponen.
+     */
+    private function seedBundleItems(): void
+    {
+        $bundle = Product::where('code', 'BDL01')->first();
+        if (!$bundle) {
+            return;
+        }
+
+        $items = [
+            [
+                'sku' => 'BDL01', 'name' => 'BOXL A', 'quantity' => 1, 'sort_order' => 0,
+                'finance_price' => 175000, 'marketing_price' => 190000, 'hpp' => 27000,
+            ],
+            [
+                'sku' => 'BDL02', 'name' => 'BOXL B', 'quantity' => 1, 'sort_order' => 1,
+                'finance_price' => 93000, 'marketing_price' => 90000, 'hpp' => 22500,
+            ],
+        ];
+
+        foreach ($items as $item) {
+            BundleItem::updateOrCreate(
+                ['bundle_product_id' => $bundle->id, 'sku' => $item['sku']],
+                $item + ['item_product_id' => null]
+            );
+        }
+    }
+
+    /**
+     * Master toko: kode hasil parsing kolom "Toko" -> Admin & Advertiser default.
+     * Contoh: "SHOPEE|raya" -> kode RAYA -> admin YAYA, advertiser default ADV EMPAT.
+     */
+    private function seedStores(): void
+    {
+        $stores = [
+            ['code' => 'SC', 'platform_code' => 'A', 'admin_name' => 'Putri', 'default_advertiser' => null],
+            ['code' => 'TB', 'platform_code' => 'TIKTOK', 'admin_name' => 'HANDOKO', 'default_advertiser' => null],
+            ['code' => 'RAYA', 'platform_code' => 'SHOPEE', 'admin_name' => 'YAYA', 'default_advertiser' => 'ADV EMPAT'],
+        ];
+
+        foreach ($stores as $s) {
+            $platform = Platform::where('code', $s['platform_code'])->first();
+            Store::updateOrCreate(
+                ['code' => $s['code']],
+                [
+                    'platform_id' => $platform?->id,
+                    'admin_name' => $s['admin_name'],
+                    'default_advertiser' => $s['default_advertiser'],
+                ]
+            );
+        }
+    }
+
+    /**
+     * Normalisasi Provinsi -> Region untuk file MARKETING.
+     */
+    private function seedRegions(): void
+    {
+        $regions = [
+            'Jawa Timur' => 'JAWA',
+            'Jawa Tengah' => 'JAWA',
+            'Jawa Barat' => 'JAWA',
+            'Banten' => 'JAWA',
+            'DKI Jakarta' => 'JAWA',
+            'DI Yogyakarta' => 'JAWA',
+        ];
+
+        foreach ($regions as $province => $region) {
+            Region::updateOrCreate(['province' => $province], ['region' => $region]);
         }
     }
 

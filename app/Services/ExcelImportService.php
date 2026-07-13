@@ -130,8 +130,9 @@ class ExcelImportService
             return $result;
         }
 
+        $dataRowCount = $worksheet->getHighestRow() - 1;
         $this->logEntry($upload, $fileType, null, 'info',
-            "Memulai proses file {$this->fileTypeMap[$fileType]} ({$worksheet->getHighestRow() - 1} baris)");
+            "Memulai proses file {$this->fileTypeMap[$fileType]} ({$dataRowCount} baris)");
 
         // Process data rows in chunks
         $highestRow = $worksheet->getHighestRow();

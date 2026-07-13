@@ -17,15 +17,15 @@
                             <th>Batch Code</th>
                             <th>Success Rows</th>
                             <th>Waktu Selesai</th>
-                            <th>Output Summary</th>
-                            <th>Output Detail Produk</th>
+                            <th>FINANCE</th>
+                            <th>MARKETING</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($uploads as $up)
                             @php
-                                $summaryFile = storage_path("app/private/outputs/Sales_Summary_Batch_{$up->batch_code}.xlsx");
-                                $detailFile = storage_path("app/private/outputs/Sales_Detail_Produk_Batch_{$up->batch_code}.xlsx");
+                                $summaryFile = storage_path("app/private/outputs/FINANCE_{$up->batch_code}.xlsx");
+                                $detailFile = storage_path("app/private/outputs/MARKETING_{$up->batch_code}.xlsx");
                             @endphp
                             <tr>
                                 <td>
@@ -37,7 +37,7 @@
                                 <td class="text-muted text-sm">{{ $up->completed_at ? $up->completed_at->format('d/m/Y H:i') : '-' }}</td>
                                 <td>
                                     @if(file_exists($summaryFile))
-                                        <a href="{{ route('output.download', [$up->id, 'summary']) }}" class="btn btn-success btn-sm">
+                                        <a href="{{ route('output.download', [$up->id, 'finance']) }}" class="btn btn-success btn-sm">
                                             <i class="ri-download-2-line"></i> Download
                                         </a>
                                     @else
@@ -46,7 +46,7 @@
                                 </td>
                                 <td>
                                     @if(file_exists($detailFile))
-                                        <a href="{{ route('output.download', [$up->id, 'detail']) }}" class="btn btn-success btn-sm">
+                                        <a href="{{ route('output.download', [$up->id, 'marketing']) }}" class="btn btn-success btn-sm">
                                             <i class="ri-download-2-line"></i> Download
                                         </a>
                                     @else

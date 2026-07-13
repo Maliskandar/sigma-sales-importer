@@ -1,58 +1,141 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Sigma Sales Importer
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sistem fullstack untuk **mengimpor 3 file Excel data sales**, memprosesnya melalui
+database (validasi, normalisasi, transformasi, pemecahan bundle, HPP per-platform),
+dan **menghasilkan 2 file output otomatis**: **FINANCE** dan **MARKETING**.
 
-## About Laravel
+Dibangun untuk Business Case Full-Stack Engineer — PT Sigma Digital Nusantara.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Tech Stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+| Layer     | Teknologi                          |
+|-----------|------------------------------------|
+| Backend   | Laravel 13 (PHP 8.3)               |
+| Database  | MySQL / PostgreSQL / SQLite        |
+| Frontend  | Blade + Vanilla JS + Vite          |
+| Queue     | Laravel Queue (database driver)    |
+| Excel     | PhpSpreadsheet                     |
+| Storage   | Local (`storage/app/private`)      |
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Alur Sistem
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+```
+Upload 3 Excel → Validasi per-baris (via DB) → Simpan ke DB (chunk + upsert)
+     → Transformasi (mapping platform, admin, region, bundle, HPP per-platform)
+     → Generate FINANCE.xlsx & MARKETING.xlsx → Notifikasi (progress bar + toast)
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+---
 
-## Contributing
+## Persyaratan
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- PHP >= 8.2 dengan ekstensi: `pdo`, `mbstring`, `gd`, `zip`, `sqlite3`/`pdo_mysql`
+- Composer
+- Node.js >= 18 & npm
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Instalasi
 
-## Security Vulnerabilities
+```bash
+# 1. Install dependency PHP & JS
+composer install
+npm install
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# 2. Siapkan environment
+cp .env.example .env
+php artisan key:generate
 
-## License
+# 3. Konfigurasi database di .env
+#    Untuk MySQL:
+#      DB_CONNECTION=mysql
+#      DB_DATABASE=sigma_sales
+#      DB_USERNAME=root
+#      DB_PASSWORD=
+#    (buat database "sigma_sales" terlebih dahulu)
+#
+#    Atau cara tercepat pakai SQLite:
+#      DB_CONNECTION=sqlite
+#      (lalu jalankan)  touch database/database.sqlite
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# 4. Migrasi + seed master data (platform, produk, bundle, toko, region, mapping)
+php artisan migrate:fresh --seed
+
+# 5. Symlink storage
+php artisan storage:link
+
+# 6. Build asset frontend
+npm run build     # atau: npm run dev (mode watch)
+```
+
+---
+
+## Menjalankan Aplikasi
+
+Buka **dua terminal**:
+
+```bash
+# Terminal 1 — web server
+php artisan serve
+# → http://127.0.0.1:8000
+
+# Terminal 2 — worker antrian (memproses import & generate output)
+php artisan queue:work
+```
+
+> Jika `QUEUE_CONNECTION=sync` di `.env`, import diproses langsung tanpa worker.
+> Untuk pemrosesan asynchronous (disarankan), set `QUEUE_CONNECTION=database`
+> dan jalankan `php artisan queue:work`.
+
+---
+
+## Cara Pakai
+
+1. Buka **Upload**, tarik-lepas (drag & drop) ketiga file:
+   `SALES DAILY.xlsx`, `SALES MP.xlsx`, `SALES PRODUK.xlsx`.
+2. Sistem memvalidasi tiap baris dan menampilkan **progress bar real-time**.
+3. Setelah selesai, buka **Output** untuk mengunduh **FINANCE** & **MARKETING**.
+4. **History** menampilkan log lengkap; error dapat diunduh sebagai laporan.
+5. **Dashboard** menampilkan ringkasan statistik hasil import.
+
+File output hasil transformasi contoh tersedia di folder [`result/`](result/).
+
+---
+
+## Struktur Data (Relasi)
+
+- **platforms** — kanal penjualan + alias + label output + payment label.
+- **products** — produk; `is_bundle` menandai bundle.
+- **bundle_items** — komponen tiap bundle (SKU, nama, harga finance/marketing, HPP).
+- **product_prices** — harga jual & HPP **per platform** (produk × platform).
+- **stores** — kode toko → admin & advertiser default.
+- **regions** — normalisasi provinsi → region.
+- **column_mappings** — pemetaan nama kolom Excel → kolom DB, per tipe file.
+- **uploads / upload_logs** — batch upload & log proses.
+- **sales_transactions** — data mentah hasil import (unique per `order_number` + `product_code` + `file_source`).
+
+Semua aturan transformasi dikendalikan lewat tabel master di atas — bukan hardcode.
+
+---
+
+## Fitur
+
+- ✅ Upload 3 file Excel sekaligus (drag & drop)
+- ✅ Validasi otomatis per baris berbasis DB
+- ✅ Progress bar real-time + toast sukses/gagal
+- ✅ Generate 2 file output otomatis (FINANCE & MARKETING)
+- ✅ History log lengkap + error report downloadable
+- ✅ Dashboard ringkasan statistik
+- ✅ Rollback data per batch (add-on)
+- ✅ Bulk upsert + unique constraint (anti-duplikasi saat re-import)
+
+---
+
+## Dokumen Terkait
+
+- [`PROBLEM.md`](PROBLEM.md) — kendala teknis & solusi yang diterapkan.
+- [`result/`](result/) — 2 file output hasil transformasi.

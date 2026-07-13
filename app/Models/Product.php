@@ -24,6 +24,14 @@ class Product extends Model
         return $this->hasMany(BundleItem::class, 'bundle_product_id');
     }
 
+    /**
+     * Komponen bundle, terurut sesuai sort_order untuk penulisan output.
+     */
+    public function components(): HasMany
+    {
+        return $this->hasMany(BundleItem::class, 'bundle_product_id')->orderBy('sort_order');
+    }
+
     public function bundleProducts(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'bundle_items', 'bundle_product_id', 'item_product_id')

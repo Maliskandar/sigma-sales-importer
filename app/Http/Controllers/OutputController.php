@@ -27,8 +27,8 @@ class OutputController extends Controller
         $outputDir = storage_path('app/private/outputs');
 
         $fileMap = [
-            'summary' => "Sales_Summary_Batch_{$upload->batch_code}.xlsx",
-            'detail' => "Sales_Detail_Produk_Batch_{$upload->batch_code}.xlsx",
+            'finance' => "FINANCE_{$upload->batch_code}.xlsx",
+            'marketing' => "MARKETING_{$upload->batch_code}.xlsx",
         ];
 
         if (!isset($fileMap[$type])) {

@@ -61,14 +61,14 @@
 <!-- Actions -->
 <div class="flex items-center gap-3 mb-6">
     @if(!empty($outputFiles))
-        @if(isset($outputFiles['summary']))
-            <a href="{{ route('output.download', [$upload->id, 'summary']) }}" class="btn btn-success">
-                <i class="ri-file-download-line"></i> Download Summary
+        @if(isset($outputFiles['finance']))
+            <a href="{{ route('output.download', [$upload->id, 'finance']) }}" class="btn btn-success">
+                <i class="ri-file-download-line"></i> Download FINANCE
             </a>
         @endif
-        @if(isset($outputFiles['detail']))
-            <a href="{{ route('output.download', [$upload->id, 'detail']) }}" class="btn btn-success">
-                <i class="ri-file-download-line"></i> Download Detail Produk
+        @if(isset($outputFiles['marketing']))
+            <a href="{{ route('output.download', [$upload->id, 'marketing']) }}" class="btn btn-success">
+                <i class="ri-file-download-line"></i> Download MARKETING
             </a>
         @endif
     @endif
