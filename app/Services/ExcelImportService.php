@@ -46,7 +46,9 @@ class ExcelImportService
             }
             $spreadsheet = IOFactory::load($filePath);
             $worksheet = $spreadsheet->getActiveSheet();
-            $totalRows += max(0, $worksheet->getHighestRow() - 1); // exclude header
+            // getHighestDataRow() menghitung baris yang benar-benar berisi data,
+            // bukan baris kosong yang sekadar punya format (yang membuat getHighestRow membengkak).
+            $totalRows += max(0, $worksheet->getHighestDataRow() - 1); // exclude header
             $spreadsheet->disconnectWorksheets();
             unset($spreadsheet);
         }
@@ -134,8 +136,9 @@ class ExcelImportService
         $this->logEntry($upload, $fileType, null, 'info',
             "Memulai proses file {$this->fileTypeMap[$fileType]} ({$dataRowCount} baris)");
 
-        // Process data rows in chunks
-        $highestRow = $worksheet->getHighestRow();
+        // Process data rows in chunks. Pakai getHighestDataRow() agar tidak
+        // mengiterasi ribuan baris kosong berformat.
+        $highestRow = $worksheet->getHighestDataRow();
         $chunkSize = 100;
         $insertBatch = [];
 

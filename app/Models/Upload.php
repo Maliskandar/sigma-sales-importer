@@ -37,7 +37,12 @@ class Upload extends Model
 
     public function getProgressPercentageAttribute(): int
     {
+        // Saat sudah selesai/gagal, proses dianggap 100% (baris kosong berformat
+        // bisa membuat total_rows sedikit lebih besar dari processed_rows).
+        if (in_array($this->status, ['completed', 'failed'], true)) {
+            return 100;
+        }
         if ($this->total_rows === 0) return 0;
-        return (int) round(($this->processed_rows / $this->total_rows) * 100);
+        return min(100, (int) round(($this->processed_rows / $this->total_rows) * 100));
     }
 }

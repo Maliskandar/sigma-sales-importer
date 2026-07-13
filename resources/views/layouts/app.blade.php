@@ -9,34 +9,40 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.1.0/fonts/remixicon.css" rel="stylesheet">
     <style>
-        /* ===== DESIGN SYSTEM ===== */
+        /* ===== DESIGN SYSTEM — LIGHT THEME (brand PT Sigma Digital Nusantara) ===== */
         :root {
-            --bg-primary: #0a0e1a;
-            --bg-secondary: #111827;
-            --bg-card: rgba(17, 24, 39, 0.7);
-            --bg-card-hover: rgba(30, 41, 59, 0.8);
-            --bg-glass: rgba(255, 255, 255, 0.03);
-            --border-glass: rgba(255, 255, 255, 0.08);
-            --border-glow: rgba(99, 102, 241, 0.3);
+            --bg-primary: #f3f6fb;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f8fafc;
+            --bg-glass: #f1f5f9;
+            --border-glass: #e4e9f1;
+            --border-glow: rgba(22, 144, 204, 0.35);
 
-            --text-primary: #f1f5f9;
-            --text-secondary: #94a3b8;
-            --text-muted: #64748b;
+            --text-primary: #14202e;
+            --text-secondary: #51617a;
+            --text-muted: #8493a8;
 
-            --accent-primary: #6366f1;
-            --accent-primary-rgb: 99, 102, 241;
-            --accent-hover: #818cf8;
-            --accent-glow: rgba(99, 102, 241, 0.15);
-            --accent-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
+            /* Biru logo */
+            --accent-primary: #1690cc;
+            --accent-primary-rgb: 22, 144, 204;
+            --accent-hover: #127bb0;
+            --accent-glow: rgba(22, 144, 204, 0.10);
+            --accent-gradient: linear-gradient(135deg, #1f9bd6, #1573b8);
 
-            --success: #22c55e;
-            --success-bg: rgba(34, 197, 94, 0.1);
-            --warning: #f59e0b;
-            --warning-bg: rgba(245, 158, 11, 0.1);
-            --error: #ef4444;
-            --error-bg: rgba(239, 68, 68, 0.1);
-            --info: #3b82f6;
-            --info-bg: rgba(59, 130, 246, 0.1);
+            /* Oranye logo (aksen sekunder) */
+            --brand-orange: #f5a623;
+            --brand-orange-strong: #f08a2e;
+            --brand-gradient: linear-gradient(135deg, #f5b431, #f08a2e);
+
+            --success: #16a34a;
+            --success-bg: rgba(22, 163, 74, 0.10);
+            --warning: #d97706;
+            --warning-bg: rgba(217, 119, 6, 0.10);
+            --error: #dc2626;
+            --error-bg: rgba(220, 38, 38, 0.09);
+            --info: #1690cc;
+            --info-bg: rgba(22, 144, 204, 0.10);
 
             --sidebar-width: 260px;
             --header-height: 70px;
@@ -45,10 +51,10 @@
             --radius-lg: 16px;
             --radius-xl: 24px;
 
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
-            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
-            --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.15);
+            --shadow-sm: 0 1px 3px rgba(20, 40, 70, 0.06);
+            --shadow-md: 0 4px 14px rgba(20, 40, 70, 0.08);
+            --shadow-lg: 0 10px 30px rgba(20, 40, 70, 0.10);
+            --shadow-glow: 0 4px 18px rgba(22, 144, 204, 0.15);
 
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -70,9 +76,8 @@
             top: 0; left: 0;
             width: 100%; height: 100%;
             background:
-                radial-gradient(ellipse at 20% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 80%, rgba(139, 92, 246, 0.06) 0%, transparent 50%),
-                radial-gradient(ellipse at 50% 50%, rgba(59, 130, 246, 0.04) 0%, transparent 50%);
+                radial-gradient(ellipse at 18% 12%, rgba(22, 144, 204, 0.07) 0%, transparent 45%),
+                radial-gradient(ellipse at 85% 85%, rgba(245, 166, 35, 0.06) 0%, transparent 45%);
             pointer-events: none;
             z-index: 0;
         }
@@ -93,37 +98,24 @@
         }
 
         .sidebar-brand {
-            padding: 24px 20px;
+            padding: 22px 20px;
             border-bottom: 1px solid var(--border-glass);
             display: flex;
             align-items: center;
-            gap: 12px;
-        }
-
-        .sidebar-brand-icon {
-            width: 42px; height: 42px;
-            background: var(--accent-gradient);
-            border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
             justify-content: center;
-            font-size: 20px;
-            color: white;
-            box-shadow: var(--shadow-glow);
         }
 
-        .sidebar-brand-text {
-            font-size: 16px;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-        }
-
-        .sidebar-brand-text span {
+        .sidebar-logo {
+            width: 100%;
+            max-width: 188px;
+            height: auto;
             display: block;
-            font-size: 11px;
-            font-weight: 400;
-            color: var(--text-muted);
-            margin-top: 2px;
+        }
+
+        .sidebar-logo-mark {
+            width: 40px;
+            height: auto;
+            display: none;
         }
 
         .sidebar-nav {
@@ -200,7 +192,7 @@
             align-items: center;
             justify-content: space-between;
             border-bottom: 1px solid var(--border-glass);
-            background: rgba(10, 14, 26, 0.6);
+            background: rgba(255, 255, 255, 0.78);
             backdrop-filter: blur(12px);
             position: sticky;
             top: 0;
@@ -338,12 +330,12 @@
         .btn-primary {
             background: var(--accent-gradient);
             color: white;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            box-shadow: 0 4px 12px rgba(22, 144, 204, 0.28);
         }
 
         .btn-primary:hover {
             transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 6px 20px rgba(22, 144, 204, 0.4);
         }
 
         .btn-secondary {
@@ -407,7 +399,7 @@
         table td {
             padding: 14px 16px;
             font-size: 13px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid var(--border-glass);
             color: var(--text-secondary);
         }
 
@@ -449,7 +441,7 @@
         /* ===== PROGRESS BAR ===== */
         .progress-container {
             width: 100%;
-            background: rgba(255, 255, 255, 0.05);
+            background: #e6ecf3;
             border-radius: 999px;
             height: 8px;
             overflow: hidden;
@@ -775,9 +767,11 @@
         /* ===== RESPONSIVE ===== */
         @media (max-width: 1024px) {
             .sidebar { width: 72px; }
-            .sidebar-brand-text,
             .sidebar-label,
-            .sidebar-link span { display: none; }
+            .sidebar-link span,
+            .sidebar-logo { display: none; }
+            .sidebar-logo-mark { display: block; }
+            .sidebar-brand { padding: 18px 8px; }
             .sidebar-link { justify-content: center; padding: 12px; }
             .sidebar-link.active::before { display: none; }
             .main-content { margin-left: 72px; }
@@ -797,13 +791,10 @@
     <!-- Sidebar -->
     <aside class="sidebar">
         <div class="sidebar-brand">
-            <div class="sidebar-brand-icon">
-                <i class="ri-bar-chart-box-fill"></i>
-            </div>
-            <div class="sidebar-brand-text">
-                Sigma Sales
-                <span>Import System</span>
-            </div>
+            <a href="{{ route('dashboard') }}" style="display:block;width:100%;text-align:center">
+                <img src="{{ asset('img/Sigma-Digital-Nusantara_Outline.png') }}" alt="PT Sigma Digital Nusantara" class="sidebar-logo">
+                <img src="{{ asset('img/sigma-mark.png') }}" alt="Sigma" class="sidebar-logo-mark">
+            </a>
         </div>
         <nav class="sidebar-nav">
             <div class="sidebar-label">Menu</div>

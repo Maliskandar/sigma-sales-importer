@@ -4,20 +4,20 @@ Sistem fullstack untuk **mengimpor 3 file Excel data sales**, memprosesnya melal
 database (validasi, normalisasi, transformasi, pemecahan bundle, HPP per-platform),
 dan **menghasilkan 2 file output otomatis**: **FINANCE** dan **MARKETING**.
 
-Dibangun untuk Business Case Full-Stack Engineer — PT Sigma Digital Nusantara.
+Dibangun untuk Business Case Full-Stack Engineer PT Sigma Digital Nusantara.
 
 ---
 
 ## Tech Stack
 
-| Layer     | Teknologi                          |
-|-----------|------------------------------------|
-| Backend   | Laravel 13 (PHP 8.3)               |
-| Database  | MySQL / PostgreSQL / SQLite        |
-| Frontend  | Blade + Vanilla JS + Vite          |
-| Queue     | Laravel Queue (database driver)    |
-| Excel     | PhpSpreadsheet                     |
-| Storage   | Local (`storage/app/private`)      |
+| Layer    | Teknologi                       |
+| -------- | ------------------------------- |
+| Backend  | Laravel 13 (PHP 8.3)            |
+| Database | MySQL / PostgreSQL / SQLite     |
+| Frontend | Blade + Vanilla JS + Vite       |
+| Queue    | Laravel Queue (database driver) |
+| Excel    | PhpSpreadsheet                  |
+| Storage  | Local (`storage/app/private`)   |
 
 ---
 
@@ -79,11 +79,11 @@ npm run build     # atau: npm run dev (mode watch)
 Buka **dua terminal**:
 
 ```bash
-# Terminal 1 — web server
+# Terminal 1 web server
 php artisan serve
 # → http://127.0.0.1:8000
 
-# Terminal 2 — worker antrian (memproses import & generate output)
+# Terminal 2 worker antrian (memproses import & generate output)
 php artisan queue:work
 ```
 
@@ -108,17 +108,17 @@ File output hasil transformasi contoh tersedia di folder [`result/`](result/).
 
 ## Struktur Data (Relasi)
 
-- **platforms** — kanal penjualan + alias + label output + payment label.
-- **products** — produk; `is_bundle` menandai bundle.
-- **bundle_items** — komponen tiap bundle (SKU, nama, harga finance/marketing, HPP).
-- **product_prices** — harga jual & HPP **per platform** (produk × platform).
-- **stores** — kode toko → admin & advertiser default.
-- **regions** — normalisasi provinsi → region.
-- **column_mappings** — pemetaan nama kolom Excel → kolom DB, per tipe file.
-- **uploads / upload_logs** — batch upload & log proses.
-- **sales_transactions** — data mentah hasil import (unique per `order_number` + `product_code` + `file_source`).
+- **platforms** kanal penjualan + alias + label output + payment label.
+- **products** produk; `is_bundle` menandai bundle.
+- **bundle_items** komponen tiap bundle (SKU, nama, harga finance/marketing, HPP).
+- **product_prices** harga jual & HPP **per platform** (produk × platform).
+- **stores** kode toko → admin & advertiser default.
+- **regions** normalisasi provinsi → region.
+- **column_mappings** pemetaan nama kolom Excel → kolom DB, per tipe file.
+- **uploads / upload_logs** batch upload & log proses.
+- **sales_transactions** data mentah hasil import (unique per `order_number` + `product_code` + `file_source`).
 
-Semua aturan transformasi dikendalikan lewat tabel master di atas — bukan hardcode.
+Semua aturan transformasi dikendalikan lewat tabel master di atas bukan hardcode.
 
 ---
 
@@ -137,5 +137,5 @@ Semua aturan transformasi dikendalikan lewat tabel master di atas — bukan hard
 
 ## Dokumen Terkait
 
-- [`PROBLEM.md`](PROBLEM.md) — kendala teknis & solusi yang diterapkan.
-- [`result/`](result/) — 2 file output hasil transformasi.
+- [`PROBLEM.md`](PROBLEM.md) kendala teknis & solusi yang diterapkan.
+- [`result/`](result/) 2 file output hasil transformasi.
