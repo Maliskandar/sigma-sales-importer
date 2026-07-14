@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\SalesTransaction;
 use App\Models\Upload;
 use App\Models\Product;
+use App\Models\Platform;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -23,11 +24,16 @@ class DashboardController extends Controller
             ->pluck('count', 'status')
             ->toArray();
 
-        // Sales per channel/kanal
+        // Sales per channel/kanal — tampilkan label platform (mis. "A" -> "WEB")
         $salesByKanal = SalesTransaction::selectRaw('kanal, COUNT(*) as total_orders, SUM(total_per_line) as total_revenue')
             ->groupBy('kanal')
             ->orderByDesc('total_revenue')
-            ->get();
+            ->get()
+            ->map(function ($item) {
+                $platform = Platform::resolveByKanal($item->kanal);
+                $item->platform_label = $platform?->output_label ?: $item->kanal;
+                return $item;
+            });
 
         // Daily sales trend
         $dailySales = SalesTransaction::selectRaw('sale_date, COUNT(*) as total_orders, SUM(total_per_line) as total_revenue')

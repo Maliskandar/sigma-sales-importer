@@ -98,24 +98,34 @@
         }
 
         .sidebar-brand {
-            padding: 22px 20px;
+            padding: 20px 18px;
             border-bottom: 1px solid var(--border-glass);
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
-        .sidebar-logo {
-            width: 100%;
-            max-width: 188px;
+        .sidebar-brand-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .sidebar-mark {
+            width: 42px;
             height: auto;
+            flex-shrink: 0;
             display: block;
         }
 
-        .sidebar-logo-mark {
-            width: 40px;
-            height: auto;
-            display: none;
+        .sidebar-brand-text {
+            font-size: 16px;
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -0.01em;
+            color: #1573b8; /* fallback bila gradient tak didukung */
+            background: linear-gradient(135deg, #1f9bd6, #1573b8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .sidebar-nav {
@@ -769,8 +779,8 @@
             .sidebar { width: 72px; }
             .sidebar-label,
             .sidebar-link span,
-            .sidebar-logo { display: none; }
-            .sidebar-logo-mark { display: block; }
+            .sidebar-brand-text { display: none; }
+            .sidebar-brand-link { justify-content: center; gap: 0; }
             .sidebar-brand { padding: 18px 8px; }
             .sidebar-link { justify-content: center; padding: 12px; }
             .sidebar-link.active::before { display: none; }
@@ -791,9 +801,9 @@
     <!-- Sidebar -->
     <aside class="sidebar">
         <div class="sidebar-brand">
-            <a href="{{ route('dashboard') }}" style="display:block;width:100%;text-align:center">
-                <img src="{{ asset('img/Sigma-Digital-Nusantara_Outline.png') }}" alt="PT Sigma Digital Nusantara" class="sidebar-logo">
-                <img src="{{ asset('img/sigma-mark.png') }}" alt="Sigma" class="sidebar-logo-mark">
+            <a href="{{ route('dashboard') }}" class="sidebar-brand-link">
+                <img src="{{ asset('img/sigma-mark.png') }}" alt="Sigma" class="sidebar-mark">
+                <span class="sidebar-brand-text">Sigma Sales Importer</span>
             </a>
         </div>
         <nav class="sidebar-nav">

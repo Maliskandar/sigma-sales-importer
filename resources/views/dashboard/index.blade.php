@@ -44,7 +44,7 @@
                                 style="height: {{ max(20, ($kanal->total_revenue / $maxRevenue) * 100) }}%">
                                 <span class="chart-bar-value">Rp
                                     {{ number_format($kanal->total_revenue / 1000, 0) }}K</span>
-                                <span class="chart-bar-label">{{ $kanal->kanal ?: 'N/A' }}</span>
+                                <span class="chart-bar-label">{{ $kanal->platform_label ?: 'N/A' }}</span>
                             </div>
                         @endforeach
                     </div>
@@ -60,7 +60,7 @@
                             <tbody>
                                 @foreach ($salesByKanal as $kanal)
                                     <tr>
-                                        <td><strong>{{ $kanal->kanal ?: 'N/A' }}</strong></td>
+                                        <td><strong>{{ $kanal->platform_label ?: 'N/A' }}</strong></td>
                                         <td>{{ number_format($kanal->total_orders) }}</td>
                                         <td class="text-right">Rp {{ number_format($kanal->total_revenue, 0, ',', '.') }}
                                         </td>
