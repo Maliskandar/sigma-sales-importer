@@ -1,4 +1,4 @@
-# PROBLEM.md — Kendala Teknis & Solusi
+# PROBLEM.md Kendala Teknis & Solusi
 
 Dokumen ini merangkum permasalahan yang muncul saat membangun **Sigma Sales Importer**
 beserta solusi yang diterapkan. Disusun mengikuti tabel "Potensi Masalah & Solusi"
@@ -9,14 +9,15 @@ pada Business Case.
 ## 1. Format 3 file input tidak konsisten
 
 **Masalah.** Ketiga file punya susunan & nama kolom berbeda:
-- `SALES DAILY` (sheet *Dailysales API*) — 24 kolom, lengkap dengan `ADV`, `Warehouse`, `Status Order`.
-- `SALES MP` (*Sheet1*) — tanpa kolom `ADV`, alamat pakai `City` / `Province` (bukan `KabupatenCustomer` / `ProvinsiCustomer`).
-- `SALES PRODUK` (*SALES ALL*) — mirip daily tapi tanpa `Warehouse` / `Status Order`.
+
+- `SALES DAILY` (sheet _Dailysales API_) 24 kolom, lengkap dengan `ADV`, `Warehouse`, `Status Order`.
+- `SALES MP` (_Sheet1_) tanpa kolom `ADV`, alamat pakai `City` / `Province` (bukan `KabupatenCustomer` / `ProvinsiCustomer`).
+- `SALES PRODUK` (_SALES ALL_) mirip daily tapi tanpa `Warehouse` / `Status Order`.
 
 **Solusi.** Mapping kolom disimpan di tabel **`column_mappings`** (per `file_type`:
 `daily` / `mp` / `produk`), bukan di-hardcode. Importer membaca header Excel lalu
 menerjemahkannya ke kolom DB via tabel ini. Menambah/mengubah nama kolom cukup
-mengubah data master — tanpa menyentuh kode.
+mengubah data master tanpa menyentuh kode.
 
 > File: `app/Services/ExcelImportService.php` (`mapRowData`), `app/Models/ColumnMapping.php`.
 
@@ -39,10 +40,10 @@ case-insensitive terhadap `code` maupun `aliases`.
 2 baris komponen (**BOXL A** & **BOXL B**). Selain itu, **Omzet komponen berbeda antara
 FINANCE dan MARKETING**:
 
-| Komponen | Omzet FINANCE | Omzet MARKETING | HPP |
-|----------|--------------:|----------------:|----:|
-| BOXL A   | 175.000       | 190.000         | 27.000 |
-| BOXL B   | 93.000        | 90.000          | 22.500 |
+| Komponen | Omzet FINANCE | Omzet MARKETING |    HPP |
+| -------- | ------------: | --------------: | -----: |
+| BOXL A   |       175.000 |         190.000 | 27.000 |
+| BOXL B   |        93.000 |          90.000 | 22.500 |
 
 (FINANCE memakai harga list per komponen; MARKETING memakai alokasi harga tagihan
 yang totalnya = 280.000.)
@@ -67,13 +68,14 @@ fallback ke `products.hpp`.
 ## 5. Kolom turunan: Admin, Region, Advertiser, Platform, Promo
 
 **Masalah.** Banyak kolom output tidak ada langsung di input, melainkan hasil turunan:
-- **Admin** (`Putri`, `HANDOKO`, `YAYA`) — tergantung toko.
-- **Nama Toko** — hasil parsing kolom `Toko` (`"SHOPEE|raya"` → `RAYA`).
-- **Advertiser** — dari kolom `ADV`; bila kosong (file marketplace) pakai default toko (`ADV EMPAT`).
-- **Region** — normalisasi provinsi (`Jawa Timur/Barat/Banten` → `JAWA`).
-- **Platform** — label output (`A` → `WEB`, `Tiktok Shop` → `TIKTOK SHOP`).
-- **Kode Promo / TaxName** — segmen terakhir kolom `Note` (`"RN/CO/CODE"` → `CODE`).
-- **Payment type** — untuk WEB pakai `MetodeBayar`; untuk marketplace pakai label platform.
+
+- **Admin** (`Putri`, `HANDOKO`, `YAYA`) tergantung toko.
+- **Nama Toko** hasil parsing kolom `Toko` (`"SHOPEE|raya"` → `RAYA`).
+- **Advertiser** dari kolom `ADV`; bila kosong (file marketplace) pakai default toko (`ADV EMPAT`).
+- **Region** normalisasi provinsi (`Jawa Timur/Barat/Banten` → `JAWA`).
+- **Platform** label output (`A` → `WEB`, `Tiktok Shop` → `TIKTOK SHOP`).
+- **Kode Promo / TaxName** segmen terakhir kolom `Note` (`"RN/CO/CODE"` → `CODE`).
+- **Payment type** untuk WEB pakai `MetodeBayar`; untuk marketplace pakai label platform.
 
 **Solusi.** Master tambahan: **`stores`** (kode → admin + advertiser default) dan
 **`regions`** (provinsi → region). Parsing `Toko` & `Note` dilakukan di
@@ -84,13 +86,16 @@ fallback ke `products.hpp`.
 ## 6. [BUG DITEMUKAN & DIPERBAIKI] Interpolasi string dengan aritmatika
 
 **Masalah.** Kode importer memuat:
+
 ```php
 "... ({$worksheet->getHighestRow() - 1} baris)"
 ```
+
 PHP **tidak mengizinkan operasi aritmatika di dalam `{$...}`** → `ParseError`,
 sehingga proses import gagal total sebelum sempat berjalan.
 
 **Solusi.** Hitung dulu ke variabel:
+
 ```php
 $dataRowCount = $worksheet->getHighestRow() - 1;
 "... ({$dataRowCount} baris)"
@@ -102,19 +107,22 @@ $dataRowCount = $worksheet->getHighestRow() - 1;
 
 **Masalah.** PhpSpreadsheet mengembalikan sebagian sel teks sebagai objek
 `RichText`, bukan `string`. Akibatnya:
+
 - Pembersihan data di importer (`is_string()` → `trim`, ubah `''`/`'-'` menjadi `null`)
   dilewati karena nilainya objek, bukan string.
-- Validasi kolom wajib memakai `empty()` — dan `empty($object)` **selalu `false`** —
+- Validasi kolom wajib memakai `empty()` dan `empty($object)` **selalu `false`**
   sehingga baris dengan **OrderNumber kosong pun lolos** dan tersimpan dengan nilai `''`.
 
 **Solusi.** Saat membaca tiap sel, objek RichText dikonversi lebih dulu ke teks biasa:
+
 ```php
 if ($cellValue instanceof \PhpOffice\PhpSpreadsheet\RichText\RichText) {
     $cellValue = $cellValue->getPlainText();
 }
 ```
+
 Setelah perbaikan, pembersihan data & validasi berjalan benar (OrderNumber kosong,
-Date kosong, kode produk tak terdaftar, Quantity 0 — semuanya tertangkap).
+Date kosong, kode produk tak terdaftar, Quantity 0 semuanya tertangkap).
 
 ---
 
@@ -122,7 +130,7 @@ Date kosong, kode produk tak terdaftar, Quantity 0 — semuanya tertangkap).
 
 **Masalah.** Meng-upload file yang sama dua kali berpotensi menggandakan baris.
 
-**Solusi.** *Unique constraint* `(order_number, product_code, file_source)` pada
+**Solusi.** _Unique constraint_ `(order_number, product_code, file_source)` pada
 `sales_transactions` + `updateOrCreate` (upsert) di `bulkUpsert()`. Re-import
 memperbarui, bukan menduplikasi. Seluruh batch dibungkus `DB::transaction`.
 
@@ -142,7 +150,7 @@ menunggu dan tidak timeout.
 
 **Masalah.** File Excel dari sumber sering menyisakan **baris kosong yang masih menyimpan
 format** (border/warna) jauh di bawah data. Akibatnya `getHighestRow()` menganggap area
-terpakai sampai ratusan baris — mis. `SALES MP` terbaca **999 baris** padahal isinya 2,
+terpakai sampai ratusan baris mis. `SALES MP` terbaca **999 baris** padahal isinya 2,
 dan `SALES PRODUK` terbaca **2 baris** padahal 1 (ada 1 baris kosong ekstra).
 
 **Solusi.** Ditambahkan helper `countDataRows()` yang menghitung **hanya baris yang
