@@ -6,6 +6,8 @@ dan **menghasilkan 2 file output otomatis**: **FINANCE** dan **MARKETING**.
 
 Dibangun untuk Business Case Full-Stack Engineer PT Sigma Digital Nusantara.
 
+🎥 **Video demo:** https://youtu.be/GB1ZLN5gz_8
+
 ---
 
 ## Tech Stack
@@ -139,3 +141,5 @@ Semua aturan transformasi dikendalikan lewat tabel master di atas bukan hardcode
 
 - [`PROBLEM.md`](PROBLEM.md) kendala teknis & solusi yang diterapkan.
 - [`result/`](result/) 2 file output hasil transformasi.
+- [`VIDEO DEMO.md`](VIDEO%20DEMO.md) tautan video demo (YouTube).
+- 🎥 Video demo: https://youtu.be/GB1ZLN5gz_8
